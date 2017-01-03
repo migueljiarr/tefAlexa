@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- From here: https://codepen.io/lbebber/pen/XJRdrV?css-preprocessor=none -->
+<style>
+body{
+	background:#f00;
+}
+.fullscreen{
+	/* set to fixed in production
+	*/
+	position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background:#000;
+    z-index: 10;
+}
+</style>
+<title> TV-Alexa demo </title>
+</head>
+
+<body>
+<div class="fullscreen" id="state">
+ <!-- <iframe src="https://becsmarthome.dnsdynamic.com/tvOff" class="screen" width="100%" height="100%"></iframe> -->
+  <iframe src="https://becsmarthome.tk/tvOff" class="screen" width="100%" height="100%"></iframe> -->
+</div>
+</body>
+<script type="text/javascript">
+	setInterval(makeRequest,2000);
+	/*
+document.getElementById("ajaxButton").onclick = function() {
+	makeRequest('updateState'); 
+  };
+	*/
+
+function makeRequest() {
+    httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      console.log('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = alertContents;
+    httpRequest.open('GET', "updateState");
+    httpRequest.send();
+  }
+
+  function alertContents() {
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+		if(httpRequest.responseText != "nothingChanged"){
+			var screen = '<iframe src="https://becsmarthome.tk/' + httpRequest.responseText + '" class="screen" width="100%" height="100%"></iframe>';
+			document.getElementById("state").innerHTML=screen;
+			console.log(httpRequest.responseText);
+		}
+		else{
+			console.log("unchanged");
+		}
+	  }
+	  else if( httpRequest.status === 304){
+		console.log(httpRequest.status);
+		console.log("nothing changed");
+      } else {
+		console.log(httpRequest.status);
+        console.log('There was a problem with the request.');
+      }
+    }
+  }
+
+</script>

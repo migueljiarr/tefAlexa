@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Huawei Smart Home</title>
+</head>
+<body>
+
+<div>
+    Username:<input id="username" value="0034600000000" type="text">
+    Password:<input id="password" value="CCpruebas_1" type="password">
+    <input id="init" type="submit" value="Sign In">
+</div>
+    <button id="socket-on-btn">ON</button>
+    <button id="socket-off-btn">OFF</button>
+
+</body>
+
+<script src='/bower_components/d3/d3.min.js'></script>
+<script src='/bower_components/eventEmitter/EventEmitter.js'></script>
+<script src="/bower_components/notification-js/build/notification.min.js"></script>
+<script src="/sdk/huaweiSmarthome.min.js"></script>
+<script src="/javascripts/demoHomeViz.js"></script>
+<script>
+    var socket = null;
+	function init(){
+		var client = HuaweiSmarthome.Client("Huawei Smarthome Webapp",
+		{
+			INFO_LOG_ON: true,
+			SHOW_HEARTBEAT: false,
+			NA_SERVER_HOST: '62.14.234.69',
+			NA_SERVER_PORT: '8443',
+			IS_SERVER_HOST: '',
+			IS_SERVER_PORT: ''
+		});
+
+		var userCredentials = {
+			key: "0034600000000",
+			secret: "CCpruebas_1"
+		};
+
+		var deviceCollection = {};
+
+		// Manejador del evento de forma que reconozca el SmartPlug.
+		// Reconoce primero el gateway y de ahi recoge los dispositivos 
+		// utilizados por este.
+		client.on(client.event.deviceReadyEvent, function (response) {
+			var deviceDetails = JSON.parse(response);
+            
+			if ("GATEWAY" !== deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && !deviceCollection[deviceDetails.deviceId]) {
+				deviceCollection[deviceDetails.deviceId] = client.Device(deviceDetails.deviceInfo.nodeId).fit(deviceDetails);
+			}
+            // Socket
+            if ("Socket".toLocaleUpperCase() === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase()) {
+				console.log("Socket: " + deviceDetails);
+				deviceCollection[deviceDetails.deviceId].addButton('SocketON', {  // commandObjectDefinition
+					description: 'This is the button to turn on the socket.',
+				    deviceId: deviceDetails.deviceId,
+                    serviceId: "Switch",
+                    header: {
+                        from: "/users/" + userCredentials.key,
+                        method: "SWITCH",
+                        mode: "NOACK"
+                    },
+                    body: {
+                        status: "ON"
+                    }
+                    }, [function () {
+                        this.do(this.buttons.SocketON.command, client.access_token);
+                    }]
+				);
+
+				deviceCollection[deviceDetails.deviceId].addButton('SocketOFF', {  // commandObjectDefinition
+				    description: 'This is the button to turn off the socket.',
+				    deviceId: deviceDetails.deviceId,
+				    serviceId: "Switch",
+				    header: {
+				        from: "/users/" + userCredentials.key,
+				        method: "SWITCH",
+				        mode: "NOACK"
+				    },
+				    body: {
+				        status: "OFF"
+				    }
+                    }, [function () {
+                        this.do(this.buttons.SocketOFF.command, client.access_token);
+                    }]
+				);
+
+               
+				socket = deviceCollection[deviceDetails.deviceId];
+
+            }
+        })
+        client.signInWithCredentials(userCredentials);
+	}
+
+    document.getElementById("init").onclick = function () {
+	  init();
+    }
+
+    document.getElementById("socket-on-btn").onclick = function () {
+		socket.buttons.SocketON.pressAndRelease();
+    }
+
+    document.getElementById("socket-off-btn").onclick = function () {
+		socket.buttons.SocketOFF.pressAndRelease();
+    }
+</script>
+
+
+</html>

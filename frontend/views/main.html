@@ -1,0 +1,183 @@
+<section ng-controller="mainPage">
+  <style>
+    body{
+      background: rgba(223,238,251,1);
+      background: -moz-linear-gradient(45deg, rgba(223,238,251,1) 0%, rgba(178,210,246,1) 71%, rgba(159,199,244,1) 100%);
+      background: -webkit-gradient(left bottom, right top, color-stop(0%, rgba(223,238,251,1)), color-stop(71%, rgba(178,210,246,1)), color-stop(100%, rgba(159,199,244,1)));
+      background: -webkit-linear-gradient(45deg, rgba(223,238,251,1) 0%, rgba(178,210,246,1) 71%, rgba(159,199,244,1) 100%);
+      background: -o-linear-gradient(45deg, rgba(223,238,251,1) 0%, rgba(178,210,246,1) 71%, rgba(159,199,244,1) 100%);
+      background: -ms-linear-gradient(45deg, rgba(223,238,251,1) 0%, rgba(178,210,246,1) 71%, rgba(159,199,244,1) 100%);
+      background: linear-gradient(45deg, rgba(223,238,251,1) 0%, rgba(178,210,246,1) 71%, rgba(159,199,244,1) 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dfeefb', endColorstr='#9fc7f4', GradientType=1 );
+    }
+    .top-navar{
+      min-height: 3em;
+      background-color: #003245;
+    }
+    .img-header{
+      width: 10%;
+      min-width: 70px;
+      margin: 0.5em 0 0 1em;
+    }
+    .tabs-container{
+      width: 80%;
+      margin: 2em 10%;
+      -webkit-box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.75);
+      -moz-box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.75);
+      box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.75);
+    }
+
+    .input-container{
+      width: 30%;
+      min-width: 200px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .icon-container{
+      width: 10%;
+    }
+
+    .md-tab>span{
+      color: #003245;
+    }
+
+    .test-button{
+      display: block;
+      width: 30%;
+      min-width: 200px;
+      max-width: 600px;
+      margin: auto;
+    }
+    .display{
+      display: inline-block;
+    }
+    .icon{
+        color: #0d47a1 !important;
+        transition: all 0.3s linear;
+        cursor: pointer;
+    }
+
+     .icon:hover{
+         color: #1e88e5 !important;
+         /* Safari */
+         -webkit-transform: rotate(-9deg);
+
+         /* Firefox */
+         -moz-transform: rotate(-9deg);
+
+         /* IE */
+         -ms-transform: rotate(-9deg);
+
+         /* Opera */
+         -o-transform: rotate(-9deg);
+     }
+    .router-button{
+      top:0;
+      left: 40%;
+    }
+  </style>
+
+  <header class="top-navar">
+    <img src="img/company_logo.png" class="img-header" alt="">
+  </header>
+
+  <div class="tabs-container">
+    <div ng-cloak>
+      <md-content md-theme="telefónica-theme">
+        <md-tabs md-selected="selectedIndex" md-dynamic-height md-border-bottom>
+          <md-tab focus-me="" label="Conexión">
+            <md-content class="md-padding">
+              <div class="input-container">
+                <md-input-container class="md-block display">
+                  <label>Bridge</label>
+                  <input ng-model="conexion.bridge">
+                    <md-icon class="material-icons icon">
+                        <md-tooltip md-direction="top">
+                            Buscar routers
+                        </md-tooltip>
+                        router
+                    </md-icon>
+                </md-input-container>
+                <md-input-container class="md-block">
+                  <label>client</label>
+                  <input ng-model="conexion.client">
+                    <md-icon class="material-icons icon">
+                        <md-tooltip md-direction="top">
+                            Ver nuevos dispositivos
+                        </md-tooltip>
+                        cast_connected
+                    </md-icon>
+                </md-input-container>
+                <md-button class="md-raised md-primary test-button" ng-click="contactWithGW()">
+                  Prueba
+                </md-button>
+                {{pepe}}
+              </div>
+             </md-content>
+          </md-tab>
+          <md-tab label="Dispositivos">
+            <md-content class="md-padding">
+              <md-subheader class="md-no-sticky">Luces conectadas de phillips hue</md-subheader>
+              <md-list-item>
+                <md-icon class="material-icons icon">lightbulb_outline</md-icon>
+                <p> {{light.name}} </p>
+                <span class="md-body-1">Bri</span>
+                <md-slider flex ng-model="light.state.bri" ng-change="updateLight(light)" min="0" max="255" aria-label="blue" id="blue-slider" class="md-primary">
+                </md-slider>
+                <script src="js/plugins/jscolor.js"></script>
+                <md-button id="styleInput" class="jscolor {valueElement:'valueInput', styleElement:'styleInput'}">
+                  Prueba
+                </md-button>
+                <input style="display: none" id="valueInput" ng-change="convertHexToRGB(light); updateLight(light)" ng-model="light.hex" value="light.hex"><br>
+                <md-switch class="md-secondary" ng-click="updateLight(light)" ng-model="light.state.on">
+                  Off/On
+                </md-switch>
+              </md-list-item>
+              <md-divider></md-divider>
+             </md-content>
+          </md-tab>
+          <md-tab label="Configuración">
+            <md-content class="md-padding">
+
+            </md-content>
+          </md-tab>
+		  <md-tab label="IFTTT">
+            <md-content class="md-padding">
+              <md-subheader class="md-no-sticky">Eventos de IFTTT</md-subheader>
+			  <md-list-item>
+			    <span>Location</span>
+			    <md-checkbox class="md-secondary"></md-checkbox>
+			  </md-list-item>
+			  <md-list-item>
+			    <span>Toggle</span>
+			    <md-checkbox class="md-secondary"></md-checkbox>
+			  </md-list-item>
+              <md-subheader class="md-no-sticky">Acciones a Telefonica</md-subheader>
+              <md-list-item>
+                <span class="md-body-1">Toogle Smartplug: </span>
+				<script src="dependencies/bower_components/eventEmitter/EventEmitter.js"></script>
+				<script src="dependencies/bower_components/notification-js/build/notification.min.js"></script>
+				<script src="dependencies/bower_components/d3/d3.min.js"></script>
+				<script src="dependencies/huaweiSmarthome.min.js"></script>
+                <md-button class="md-raised md-primary test-button" ng-click="init()">
+                  init
+                </md-button>
+                <md-button class="md-raised md-primary test-button" ng-click="toggle()">
+                  Toogle
+                </md-button>
+              </md-list-item>
+              <md-list-item>
+              <md-subheader class="md-no-sticky" id="userOut"> Estado: desconectado.</md-subheader>
+              </md-list-item>
+			  <md-divider>
+			  </md-divider>
+             </md-content>
+          </md-tab>
+
+        </md-tabs>
+      </md-content>
+    </div>
+  </div>
+
+</section>
