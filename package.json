@@ -1,5 +1,5 @@
 {
-  "name": "Telefinica-Alexa",
+  "name": "Telefonica-Alexa",
   "version": "0.0.1",
   "description": "You don't wanna know.",
   "main": "app.js",
@@ -21,10 +21,11 @@
   "dependencies": {
     "alexa-app": "^2.3.4",
     "socket.io": "^1.5.1",
-    "angular": "^1.5.7",
-    "angular-animate": "^1.5.7",
-    "angular-aria": "^1.5.7",
-    "angular-material": "^1.1.0-rc.5",
+    "jquery": "^3.1.1",
+    "angular": "^1.6.1",
+    "angular-animate": "^1.6.1",
+    "angular-aria": "^1.6.1",
+    "angular-material": "^1.1.1",
     "angular-messages": "^1.5.7",
     "angular-translate": "^2.11.0",
     "angular-ui-router": "^0.3.1",

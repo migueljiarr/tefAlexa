@@ -1,0 +1,6 @@
+Proof of concept of Telefonica's Smart Home services with Alexa.
+
+Build instructions:
+
+npm install
+npm start

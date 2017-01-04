@@ -8,19 +8,22 @@ module.exports = function (app) {
             $scope.socket = null;
             $scope.socketStatus = null;
             $scope.toggling = 0;
+            console.log("init1");
             client = HuaweiSmarthome.Client("IFTTT-TEF",
                 {
                     INFO_LOG_ON: true,
                     SHOW_HEARTBEAT: false,
-                    NA_SERVER_HOST: '62.14.234.69',
+                    NA_SERVER_HOST: '62.14.234.67',
                     NA_SERVER_PORT: '8443',
                     IS_SERVER_HOST: '',
                     IS_SERVER_PORT: ''
                 });
+            console.log("init2");
 
             var userCredentials = {
-                key: "0034600000000",
-                secret: "CCpruebas_1"
+                key: "0034123456789",
+                //key: "987654321",
+                secret: "Aa123456"
             };
 
             var deviceCollection = {};
@@ -98,7 +101,9 @@ module.exports = function (app) {
                 }
 
             })
+            console.log("init3");
             client.signInWithCredentials(userCredentials);
+            console.log("init4");
         }
 
         $scope.init();
@@ -148,7 +153,7 @@ module.exports = function (app) {
 				})
         }
 
-        var interval = $interval(setSmartplug,5000);
+        //var interval = $interval(setSmartplug,5000);
 
         $scope.contactWithGW = function () {
             $scope.pepe = {};
