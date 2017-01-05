@@ -241,7 +241,10 @@ var prevState = "";
      	}
  );
 
-
+router.post('/UpdateTef', function(req, res, next){
+    console.log(JSON.stringify(req.body));
+    res.status(200);
+});
 
 
 

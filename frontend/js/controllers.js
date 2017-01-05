@@ -3,6 +3,7 @@ module.exports = function (app) {
     app.controller('mainPage', function ($scope,$http,$interval) {
         $scope.selectedIndex = 0;
         $scope.client=null;
+	$scope.tefDevicesData = {"bull":"shit"};
         $scope.init= function () {
             console.log("init");
             $scope.socket = null;
@@ -33,6 +34,7 @@ module.exports = function (app) {
             // utilizados por este.
             client.on(client.event.deviceReadyEvent, function (response) {
                 var deviceDetails = JSON.parse(response);
+		tefDevicesData[deviceDetails.deviceId] = deviceDetails;
 
                 if ("GATEWAY" !== deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && !deviceCollection[deviceDetails.deviceId]) {
                     document.getElementById("userOut").innerHTML = "Estado: Conectado.";
@@ -125,32 +127,45 @@ module.exports = function (app) {
             console.log("Retrieved");
         };
 
+	function updateTef(){
+	    $http.post('/UpdateTef',$scope.tefDevicesData)
+                .success(function (data) {
+                    console.log('Success during /UpdateTef: ');
+                    console.log(data);
+                })
+                .error(function (error) {
+                    console.log('Error during /UpdateTef: ');
+                    console.log(error);
+                })
+	}
+        var interval = $interval(updateTef,5000);
+
         // var stopTime = $interval(setSmartplug, 1000);
         function setSmartplug() {
             //console.log('Im ready to send the request');
             $http.get('/api/smartplug/status')
                 .success(function (data) {
                     if(data.state == true){
-						console.log("state is true");
-						alert("Ha llegado un evento de IFTTT");
+			console.log("state is true");
+			alert("Ha llegado un evento de IFTTT");
                         if(data.light == true){
                             //lo que tengas que hacer para encender smartplug aqui
-							console.log("YayON!!");
+			    console.log("YayON!!");
                             $scope.turnOn()
                         }
                         else{
                             //lo que tengas que hacer para apagar smartplug aqui
-							console.log("YayOFF!!");
+			    console.log("YayOFF!!");
                             $scope.turnOff()
                         }
                     }
-					else{
-						console.log("state is false");
-					}
-				})
-				.error(function(data){
-					console.log("error");
-				})
+		    else{
+		   	console.log("state is false");
+		    }
+		})
+		.error(function(data){
+		    console.log("error");
+		})
         }
 
         //var interval = $interval(setSmartplug,5000);
@@ -165,41 +180,6 @@ module.exports = function (app) {
                 .error(function (error) {
                     $scope.pepe = error;
                 })
-        };
-
-        // $http.get('/api/lights')
-        //     .success(function (data) {
-        //         console.log('print1');
-        //         console.log(data);
-        //         $scope.lights = data;
-        //         $scope.lights.map(function (light) {
-        //             console.log('estoy aqui');
-        //             light.hex = rgbToHex(light.r, light.g, light.b);
-        //         });
-        //         console.log('print2');
-        //         console.log($scope.lights);
-        //     })
-        //     .error(function (error) {
-        //         console.log(error);
-        //     });
-
-        function componentToHex(c) {
-            var hex = c.toString(16);
-            return hex.length == 1 ? "0" + hex : hex;
-        }
-
-        function rgbToHex(r, g, b) {
-            return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-        }
-
-        $scope.convertHexToRGB = function(light) {
-            console.log(light);
-            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(light.hex);
-            console.log(result);
-            light.r = parseInt(result[1], 16);
-            light.g = parseInt(result[2], 16);
-            light.b = parseInt(result[3], 16);
-            console.log(light);
         };
 
         $scope.updateLight = function (light) {
