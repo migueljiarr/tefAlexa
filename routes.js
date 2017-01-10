@@ -11,6 +11,9 @@ var fs = require('fs');
 var state = "";
 var prevState = "";
 
+var tefDevicesData  = {}; // Raw data from Huawei.
+var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}; // Useful data to give Alexa.
+
  alexa.messages.NO_INTENT_FOUND = "Sorry, can you repeat?";
 
  alexa.launch(function(request,response) {
@@ -241,8 +244,91 @@ var prevState = "";
      	}
  );
 
+function dataTreatment(){
+	console.log("weeee: Who doesn't love Data Treatment? Me, duh.");
+	var name, status, data;
+	Object.keys(tefDevicesData).forEach(function (key){
+		console.log(key);
+		console.log(JSON.stringify(tefDevicesData[key].deviceInfo));
+		if(tefDevicesData[key].deviceInfo.deviceType == "MultiSensor"){
+			name = tefDevicesData[key].deviceInfo.name;
+			status = tefDevicesData[key].deviceInfo.status;
+			data = {};
+			data.temperature = tefDevicesData[key].services[0].data;
+			data.humidity    = tefDevicesData[key].services[1].data;
+			data.batteryLevel= tefDevicesData[key].services[2].data;
+			data.motion      = tefDevicesData[key].services[3].data;
+			if(tefDevicesStates.multisensors.length == 0)
+				tefDevicesStates.multisensors.push({"key":key,"name":name,"status":status,"data":data});
+			else{
+				tefDevicesStates.multisensors.forEach(function (d){
+					if(d.key != key){
+						tefDevicesStates.multisensors.push({"key":key,"name":name,"status":status,"data":data});
+					}
+					else console.log("The multisensor " + d.name + " already exists.");
+				});
+			}
+		}
+		if(tefDevicesData[key].deviceInfo.deviceType == "ContactSensor"){
+			console.log(key + "ContactSensor");
+			name = tefDevicesData[key].deviceInfo.name;
+			status = tefDevicesData[key].deviceInfo.status;
+			data = {};
+			data.batteryLevel= tefDevicesData[key].services[0].data;
+			data.status		 = tefDevicesData[key].services[1].data;
+			if(tefDevicesStates.contactsensors.length == 0)
+				tefDevicesStates.contactsensors.push({"key":key,"name":name,"status":status,"data":data});
+			else{
+				tefDevicesStates.contactsensors.forEach(function (d){
+					if(d.key != key){
+						tefDevicesStates.contactsensors.push({"key":key,"name":name,"status":status,"data":data});
+					}
+					else console.log("The contactsensor " + d.name + " already exists.");
+				});
+			}
+		}
+		if(tefDevicesData[key].deviceInfo.deviceType == "Camera"){
+			console.log(key + "Camera");
+			name = tefDevicesData[key].deviceInfo.name;
+			status = tefDevicesData[key].deviceInfo.status;
+			data = {};
+			data.PROVISIONAL = tefDevicesData[key].services[0].data;
+			if(tefDevicesStates.cameras.length == 0)
+				tefDevicesStates.cameras.push({"key":key,"name":name,"status":status,"data":data});
+			else{
+				tefDevicesStates.cameras.forEach(function (d){
+					if(d.key != key){
+						tefDevicesStates.cameras.push({"key":key,"name":name,"status":status,"data":data});
+					}
+					else console.log("The camera " + d.name + " already exists.");
+				});
+			}
+		}
+		if(tefDevicesData[key].deviceInfo.deviceType == "Socket"){
+			console.log(key + "Socket");
+			name = tefDevicesData[key].deviceInfo.name;
+			status = tefDevicesData[key].deviceInfo.status;
+			data = {};
+			data.status = tefDevicesData[key].services[0].data;
+			if(tefDevicesStates.sockets.length == 0)
+				tefDevicesStates.sockets.push({"key":key,"name":name,"status":status,"data":data});
+			else{
+				tefDevicesStates.sockets.forEach(function (d){
+					if(d.key != key){
+						tefDevicesStates.sockets.push({"key":key,"name":name,"status":status,"data":data});
+					}
+					else console.log("The socket " + d.name + " already exists.");
+				});
+			}
+		}
+	});
+	console.log("tefDevicesStates: " + JSON.stringify(tefDevicesStates));
+}
+
 router.post('/UpdateTef', function(req, res, next){
     console.log("Here is tefDevicesData: " + JSON.stringify(req.body));
+	tefDevicesData = req.body;
+	dataTreatment();
     res.status(200);
 	res.send("{}"); // Clients expects an answer with Content-type:text/json and 
 					// if empty it reports an "no element found" error.
