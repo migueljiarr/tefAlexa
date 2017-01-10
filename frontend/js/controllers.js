@@ -3,7 +3,7 @@ module.exports = function (app) {
     app.controller('mainPage', function ($scope,$http,$interval) {
         $scope.selectedIndex = 0;
         $scope.client=null;
-	$scope.tefDevicesData = {"bull":"shit"};
+		$scope.tefDevicesData = {};
         $scope.init= function () {
             console.log("init");
             $scope.socket = null;
@@ -37,7 +37,7 @@ module.exports = function (app) {
                 var deviceDetails = JSON.parse(response);
 				
 				console.log("New device: " + JSON.stringify(deviceDetails));
-				tefDevicesData[deviceDetails.deviceId] = deviceDetails;
+				$scope.tefDevicesData[deviceDetails.deviceId] = deviceDetails;
 
                 if ("GATEWAY" !== deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && !deviceCollection[deviceDetails.deviceId]) {
                     document.getElementById("userOut").innerHTML = "Estado: Conectado.";
@@ -167,18 +167,15 @@ module.exports = function (app) {
             console.log("Retrieved");
         };
 
-	function updateTef(){
-	    $http.post('/UpdateTef',$scope.tefDevicesData)
-                .success(function (data) {
-                    console.log('Success during /UpdateTef: ');
-                    console.log(data);
+        $scope.updateTef = function () {
+			$http.post('/UpdateTef',$scope.tefDevicesData)
+                .then(function (data) {
+                    console.log('During /UpdateTef: ');
+                    console.log(JSON.stringify(data));
+                    console.log('End /UpdateTef treatment.');
                 })
-                .error(function (error) {
-                    console.log('Error during /UpdateTef: ');
-                    console.log(error);
-                })
-	}
-        var interval = $interval(updateTef,5000);
+		};
+        var interval = $interval($scope.updateTef,5000);
 
         // var stopTime = $interval(setSmartplug, 1000);
         function setSmartplug() {
@@ -186,26 +183,26 @@ module.exports = function (app) {
             $http.get('/api/smartplug/status')
                 .success(function (data) {
                     if(data.state == true){
-			console.log("state is true");
-			alert("Ha llegado un evento de IFTTT");
+						console.log("state is true");
+						alert("Ha llegado un evento de IFTTT");
                         if(data.light == true){
                             //lo que tengas que hacer para encender smartplug aqui
-			    console.log("YayON!!");
+							console.log("YayON!!");
                             $scope.turnOn()
                         }
                         else{
                             //lo que tengas que hacer para apagar smartplug aqui
-			    console.log("YayOFF!!");
+							console.log("YayOFF!!");
                             $scope.turnOff()
                         }
-                    }
-		    else{
-		   	console.log("state is false");
-		    }
-		})
-		.error(function(data){
-		    console.log("error");
-		})
+					}
+					else{
+						console.log("state is false");
+					}
+				})
+				.error(function(data){
+					console.log("error");
+				})
         }
 
         //var interval = $interval(setSmartplug,5000);

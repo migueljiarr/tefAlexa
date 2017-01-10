@@ -242,8 +242,10 @@ var prevState = "";
  );
 
 router.post('/UpdateTef', function(req, res, next){
-    console.log(JSON.stringify(req.body));
+    console.log("Here is tefDevicesData: " + JSON.stringify(req.body));
     res.status(200);
+	res.send("{}"); // Clients expects an answer with Content-type:text/json and 
+					// if empty it reports an "no element found" error.
 });
 
 
