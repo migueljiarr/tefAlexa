@@ -6,19 +6,20 @@ module.exports = function (app) {
         $scope.init= function () {
             console.log("init");
             $scope.socket = null;
+            $scope.motionSensor = null;
+            $scope.doorSensor = null;
+            $scope.camera = null;
             $scope.socketStatus = null;
             $scope.toggling = 0;
-            console.log("init1");
             client = HuaweiSmarthome.Client("IFTTT-TEF",
                 {
                     INFO_LOG_ON: true,
                     SHOW_HEARTBEAT: false,
-                    NA_SERVER_HOST: '62.14.234.67',
+                    NA_SERVER_HOST: '62.14.234.69',
                     NA_SERVER_PORT: '8443',
                     IS_SERVER_HOST: '',
                     IS_SERVER_PORT: ''
                 });
-            console.log("init2");
 
             var userCredentials = {
                 key: "0034123456789",
@@ -33,6 +34,8 @@ module.exports = function (app) {
             // utilizados por este.
             client.on(client.event.deviceReadyEvent, function (response) {
                 var deviceDetails = JSON.parse(response);
+				
+				console.log("New device: " + JSON.stringify(deviceDetails));
 
                 if ("GATEWAY" !== deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && !deviceCollection[deviceDetails.deviceId]) {
                     document.getElementById("userOut").innerHTML = "Estado: Conectado.";
@@ -40,6 +43,44 @@ module.exports = function (app) {
                     $scope.socketStatus=null;
                     toggling=0;
                 }
+                if ("MULTISENSOR" === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase()) {
+                    let multiSensorData = {};
+                    for (let index in deviceDetails.services) {
+                        if (deviceDetails.services[index].data !== null && deviceDetails.services[index].data.temperature) {
+                            multiSensorData.temperature = deviceDetails.services[index].data.temperature;
+                        }
+                        if (deviceDetails.services[index].data !== null && deviceDetails.services[index].data.humidity) {
+                            multiSensorData.humidity = deviceDetails.services[index].data.humidity;
+                        }
+                        if (deviceDetails.services[index].data !== null && deviceDetails.services[index].data.motion) {
+                            multiSensorData.motion = deviceDetails.services[index].data.motion;
+                        }
+						console.log("New multiSensor: " + JSON.stringify(multiSensorData));
+                    }
+                }
+                if ("DOORWINDOW" === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase()) {
+                    let doorWindowSensorData = {};
+                    if (deviceDetails.services[0].data !== null && deviceDetails.services[0].data.batteryLevel) {
+                        doorWindowSensorData.batteryLevel = deviceDetails.services[index].data.batteryLevel;
+                    }
+                    if (deviceDetails.services[1].data !== null && deviceDetails.services[1].data.status) {
+                        doorWindowSensorData.status = deviceDetails.services[index].data.status;
+                    }
+					console.log("New DoorWindowSensor: " + JSON.strigify(doorWindowSensorData));
+                }
+                if ("CAMERA" === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase()) {
+					console.log("New Camera: " + JSON.stringify(deviceDetails));
+/*
+                    let doorWindowSensorData = {};
+                    if (deviceDetails.services[0].data !== null && deviceDetails.services[0].data.batteryLevel) {
+                        doorWindowSensorData.batteryLevel = deviceDetails.services[index].data.batteryLevel;
+                    }
+                    if (deviceDetails.services[1].data !== null && deviceDetails.services[1].data.status) {
+                        doorWindowSensorData.status = deviceDetails.services[index].data.status;
+                    }
+*/
+                }
+
                 // Socket
                 if ("Socket".toLocaleUpperCase() === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && $scope.socketStatus==null) {
                     console.log("Socket: " + deviceDetails);
@@ -101,9 +142,8 @@ module.exports = function (app) {
                 }
 
             })
-            console.log("init3");
             client.signInWithCredentials(userCredentials);
-            console.log("init4");
+            console.log("end init");
         }
 
         $scope.init();
