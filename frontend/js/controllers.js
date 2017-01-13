@@ -168,13 +168,13 @@ module.exports = function (app) {
         };
 
         $scope.updateTef = function () {
-			$http.post('/UpdateTef',$scope.tefDevicesData)
+		$http.post('/UpdateTef',$scope.tefDevicesData)
                 .then(function (data) {
-                    console.log('During /UpdateTef: ');
-                    console.log(JSON.stringify(data));
-                    console.log('End /UpdateTef treatment.');
-                })
-		};
+                	console.log('During /UpdateTef: ');
+	                console.log(JSON.stringify(data));
+       			console.log('End /UpdateTef treatment.');
+                });
+	};
         var interval = $interval($scope.updateTef,5000);
 
         // var stopTime = $interval(setSmartplug, 1000);
