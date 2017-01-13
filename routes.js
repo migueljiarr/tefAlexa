@@ -24,6 +24,25 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	response.reprompt("Sorry, I didn't catch that. Could you repeat?");
  });
 
+ alexa.intent('InformSetupIntent',
+	{
+	},
+	function(request,response){
+		response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+		console.log('Estoy en InformSetupINTENT');
+		prevState=state;
+		state="InformGeneralStateToday";
+		var numMS, numCS, numC, numS;
+		numMS = tefDevicesStates.multisensors.length;
+		numCS = tefDevicesStates.contactsensors.length;
+		numC = tefDevicesStates.cameras.length;
+		numS = tefDevicesStates.sockets.length;
+		response.say("Currently Telefonica detects " + numMS + " multisensor, " + numCS + " contact sensor, " + numC + " camera and " + numS + " socket.");
+		response.say("Do you need anything else?");
+		response.shouldEndSession(true);
+	}
+ );
+
  alexa.intent('InformGeneralStateIntent',
      	{
          "slots":{
@@ -38,7 +57,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		prevState=state;
 		if(time == "today"){
 			state="InformGeneralStateToday";
-			response.say("Today your doors have been opened five times, there has been movement in your home ten times and there are two new recordings.");
+			response.say("Fake. Today your doors have been opened five times, there has been movement in your home ten times and there are two new recordings.");
 		}
 		else if(time == "now"){
 			state="InformGeneralStateNow";
@@ -66,9 +85,42 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		var time = request.slot("time");
 		prevState=state;
 		if(time == "now"){
-			if(sensor == "motion sensor"){
-				state="MotionSensorNow";
-				response.say("Right now there is not movement detected by the sensors.");
+			if(sensor == "multi sensor"){
+				state="MultiSensorNow";
+				temp = tefDevicesStates.multisensors[0].data.temperature.temperature;
+				response.say("The temperature right now in your home is " + temp + " degrees celsius. ");
+				hum = tefDevicesStates.multisensors[0].data.humidity.humidity;
+				response.say("The humidity in your home is " + hum + " percentage. ");
+				mov = tefDevicesStates.multisensors[0].data.motion.motion;
+				t = tefDevicesStates.multisensors[0].data.motion.startTime;
+				console.log("startTime: " + t);
+				t = t.substr(0, 4) + "-" + t.substr(4);
+				t = t.substr(0, 7) + "-" + t.substr(7);
+				t = t.substr(0, 13) + ":" + t.substr(13);
+				t = t.substr(0, 16) + ":" + t.substr(16);
+				console.log("startTime: " + t);
+				t = new Date(t);
+				console.log("parsed: " + t);
+				today = new Date();
+				today = today.getDay();
+				day = t.getDay();
+				day = today - day;
+				console.log("day: " + day);
+				hour = t.getUTCHours() + ":" + t.getUTCMinutes();
+				hour = hour.substr(0, 0) + "0" + hour.substr(0);
+				hour = hour.substr(0, 3) + "0" + hour.substr(3);
+				console.log("hour: " + hour);
+				if(mov == "DETECTED")
+					if(day == 0)
+						response.say("There has been motion detected today " + " at " + hour + ".");
+					else if(day == 1)
+						response.say("There has been motion detected yesterday " + " at " + hour + ".");
+					else
+						response.say("There has been motion detected " + day + " days ago at " + hour + ".");
+				else
+					response.say("There hasn't been motion detected.");
+				bat = tefDevicesStates.multisensors[0].data.batteryLevel.batteryLevel;
+				response.say("And the battery of the multisensor is " + bat + " percentage. ");
 			}
 			else if(sensor == "door sensor"){
 				state="DoorSensorNow";
@@ -86,19 +138,19 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		else if(time == "today"){
 			if(sensor == "motion sensor"){
 				state="MotionSensorToday";
-				response.say("Today your there has been movement in your home ten times.");
+				response.say("Fake. Today your there has been movement in your home ten times.");
 			}
 			else if(sensor == "door sensor"){
 				state="DoorSensorToday";
-				response.say("Today your doors have been opened five times.");
+				response.say("Fake. Today your doors have been opened five times.");
 			}
 			else if(sensor == "camera"){
 				state="CameraToday";
-				response.say("Today your camera has two new recordings.");
+				response.say("Fake. Today your camera has two new recordings.");
 			}
 			else{
 				state="RepeatToday";
-				response.say("Sorry I didn't recognized the device, can you repeat?.");
+				response.say("Fake. Sorry I didn't recognized the device, can you repeat?.");
 			}
 		}
 		else{
@@ -109,6 +161,35 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	}
  );
 
+ alexa.intent('TemperatureIntent',
+	{
+	},
+	function(request,response){
+		response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+		console.log("Estoy en TemperatureIntent");
+		prevState=state;
+		state="Temperature";
+		temp = tefDevicesStates.multisensors[0].data.temperature.temperature;
+		response.say("The temperature right now in your home is " + temp + " degrees celsius. ");
+		response.say("Do you need anything else?");
+		response.shouldEndSession(false);
+	}
+ );
+
+ alexa.intent('HumidityIntent',
+	{
+	},
+	function(request,response){
+		response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+		console.log("Estoy en TemperatureIntent");
+		prevState=state;
+		state="Temperature";
+		hum = tefDevicesStates.multisensors[0].data.humidity.humidity;
+		response.say("The humidity in your home is " + hum + " percentage. ");
+		response.say("Do you need anything else?");
+		response.shouldEndSession(false);
+	}
+ );
 
 
 
