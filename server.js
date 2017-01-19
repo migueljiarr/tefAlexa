@@ -26,10 +26,11 @@ server = https.createServer(options, app);
 io = require('socket.io').listen(server);  
 
 // Production.
-server.listen(8443);  
+var port = 8443;  
 
 // Test.
-//server.listen(8444);  
+//var port = 8444;  
 
-//console.log('servidor funcionando por el puerto' + port);
-console.log('servidor funcionando por el puerto ' + 8444);
+server.listen(port);  
+
+console.log('servidor funcionando por el puerto ' + port);
