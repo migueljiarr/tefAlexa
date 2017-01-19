@@ -150,7 +150,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			}
 			else if(sensor == "socket"){
 				state="SocketNow";
-				response.say("Your socket is on.");
+				st = tefDevicesStates.sockets[0].data.status.status;
+				response.say("Your socket is " + st + ".");
 			}
 			else{
 				state="RepeatNow";

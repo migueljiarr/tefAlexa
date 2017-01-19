@@ -167,6 +167,15 @@ module.exports = function (app) {
             console.log("Retrieved");
         };
 
+        $scope.updateDeviceDetails = function () {
+			console.log('Asking Huawei for an update: ');
+			Object.keys($scope.tefDevicesData).forEach(function(key){
+				console.log("KEY of device: " + key);
+  				client.getDeviceDetails(key);
+			});
+		};
+        var interval = $interval($scope.updateDeviceDetails,5000);
+
         $scope.updateTef = function () {
 		$http.post('/UpdateTef',$scope.tefDevicesData)
                 .then(function (data) {
@@ -174,7 +183,7 @@ module.exports = function (app) {
 	                console.log(JSON.stringify(data));
        			console.log('End /UpdateTef treatment.');
                 });
-	};
+		};
         var interval = $interval($scope.updateTef,5000);
 
         // var stopTime = $interval(setSmartplug, 1000);
