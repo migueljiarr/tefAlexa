@@ -10,8 +10,8 @@ var router = require('./app');
 //var port = process.env.PORT || 8000;
 
 //var sslPath = '/etc/letsencrypt/live/becsmarthome.dnsdynamic.com/';
-var sslPath = '/etc/letsencrypt/live/becsmarthome.tk/';
-//var sslPath = '/home/migueljiarr/Projects/Work/tk/';
+//var sslPath = '/etc/letsencrypt/live/becsmarthome.tk/';
+var sslPath = '/home/migueljiarr/Projects/Work/tk/';
 
 var options = {  
     key: fs.readFileSync(sslPath + 'privkey.pem'),
@@ -25,11 +25,7 @@ app.use(router);
 server = https.createServer(options, app);  
 io = require('socket.io').listen(server);  
 
-// Production.
 var port = 8443;  
-
-// Test.
-//var port = 8444;  
 
 server.listen(port);  
 
