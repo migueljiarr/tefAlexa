@@ -87,11 +87,14 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		if(time == "now"){
 			if(sensor == "multi sensor"){
 				state="MultiSensorNow";
+
 				temp = tefDevicesStates.multisensors[0].data.temperature.temperature;
 				//response.say("The temperature right now in your home is " + Math.round(temp) + " degrees celsius. ");
 				response.say("The temperature right now in your home is " + temp + " degrees celsius. ");
+
 				hum = tefDevicesStates.multisensors[0].data.humidity.humidity;
 				response.say("The humidity in your home is " + hum + " percent. ");
+
 				mov = tefDevicesStates.multisensors[0].data.motion.motion;
 				t = tefDevicesStates.multisensors[0].data.motion.startTime;
 				console.log("startTime: " + t);
@@ -122,16 +125,32 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 						response.say("There has been motion detected "+day+" days ago at "+t.getUTCHours()+" "+minu+".");
 				else
 					response.say("There hasn't been motion detected.");
+
 				bat = tefDevicesStates.multisensors[0].data.batteryLevel.batteryLevel;
 				response.say("And the battery of the multisensor is " + bat + " percent. ");
 			}
 			else if(sensor == "door sensor"){
 				state="DoorSensorNow";
-				response.say("Right now there two doors open.");
+				//response.say("Right now there two doors open.");
+
+				st = tefDevicesStates.contactsensors[0].data.status.status;
+				if(st == "CLOSED"){
+					response.say("Your door is close.");
+				}
+				else{
+					response.say("Your door is open.");
+				}
+
+				bat = tefDevicesStates.contactsensors[0].data.batteryLevel.batteryLevel;
+				response.say("And the battery of the door sensor is " + bat + " percent. ");
 			}
 			else if(sensor == "camera"){
 				state="CameraNow";
 				response.say("Right now the cameras are not recording.");
+			}
+			else if(sensor == "socket"){
+				state="SocketNow";
+				response.say("Your socket is on.");
 			}
 			else{
 				state="RepeatNow";
@@ -329,7 +348,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
  );
 
 function dataTreatment(){
-	console.log("weeee: Who doesn't love Data Treatment? Me, duh.");
+	console.log("New data. Weeeeee!");
 	var name, status, data;
 	Object.keys(tefDevicesData).forEach(function (key){
 		console.log(key);
@@ -345,11 +364,15 @@ function dataTreatment(){
 			if(tefDevicesStates.multisensors.length == 0)
 				tefDevicesStates.multisensors.push({"key":key,"name":name,"status":status,"data":data});
 			else{
-				tefDevicesStates.multisensors.forEach(function (d){
+				tefDevicesStates.multisensors.forEach(function (d, index, erray){
 					if(d.key != key){
 						tefDevicesStates.multisensors.push({"key":key,"name":name,"status":status,"data":data});
 					}
-					else console.log("The multisensor " + d.name + " already exists.");
+					else{
+						// Currently we don't check if the data has changed. We just overwrite the previous data.
+						tefDevicesStates.multisensors[index] = {"key":key,"name":name,"status":status,"data":data};
+						console.log("The multisensor " + d.name + " already exists. Updated.");
+					}
 				});
 			}
 		}
@@ -363,11 +386,15 @@ function dataTreatment(){
 			if(tefDevicesStates.contactsensors.length == 0)
 				tefDevicesStates.contactsensors.push({"key":key,"name":name,"status":status,"data":data});
 			else{
-				tefDevicesStates.contactsensors.forEach(function (d){
+				tefDevicesStates.contactsensors.forEach(function (d, index, array){
 					if(d.key != key){
 						tefDevicesStates.contactsensors.push({"key":key,"name":name,"status":status,"data":data});
 					}
-					else console.log("The contactsensor " + d.name + " already exists.");
+					else{
+						// Currently we don't check if the data has changed. We just overwrite the previous data.
+						tefDevicesStates.contactsensors[index] = {"key":key,"name":name,"status":status,"data":data};
+						console.log("The contactsensor" + d.name + " already exists. Updated.");
+					}
 				});
 			}
 		}
@@ -380,11 +407,15 @@ function dataTreatment(){
 			if(tefDevicesStates.cameras.length == 0)
 				tefDevicesStates.cameras.push({"key":key,"name":name,"status":status,"data":data});
 			else{
-				tefDevicesStates.cameras.forEach(function (d){
+				tefDevicesStates.cameras.forEach(function (d, index, array){
 					if(d.key != key){
 						tefDevicesStates.cameras.push({"key":key,"name":name,"status":status,"data":data});
 					}
-					else console.log("The camera " + d.name + " already exists.");
+					else{
+						// Currently we don't check if the data has changed. We just overwrite the previous data.
+						tefDevicesStates.cameras[index] = {"key":key,"name":name,"status":status,"data":data};
+						console.log("The camera" + d.name + " already exists. Updated.");
+					}
 				});
 			}
 		}
@@ -397,11 +428,15 @@ function dataTreatment(){
 			if(tefDevicesStates.sockets.length == 0)
 				tefDevicesStates.sockets.push({"key":key,"name":name,"status":status,"data":data});
 			else{
-				tefDevicesStates.sockets.forEach(function (d){
+				tefDevicesStates.sockets.forEach(function (d, index, array){
 					if(d.key != key){
 						tefDevicesStates.sockets.push({"key":key,"name":name,"status":status,"data":data});
 					}
-					else console.log("The socket " + d.name + " already exists.");
+					else{
+						// Currently we don't check if the data has changed. We just overwrite the previous data.
+						tefDevicesStates.sockets[index] = {"key":key,"name":name,"status":status,"data":data};
+						console.log("The socket" + d.name + " already exists. Updated.");
+					}
 				});
 			}
 		}
