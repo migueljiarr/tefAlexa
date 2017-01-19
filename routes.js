@@ -88,9 +88,10 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			if(sensor == "multi sensor"){
 				state="MultiSensorNow";
 				temp = tefDevicesStates.multisensors[0].data.temperature.temperature;
+				//response.say("The temperature right now in your home is " + Math.round(temp) + " degrees celsius. ");
 				response.say("The temperature right now in your home is " + temp + " degrees celsius. ");
 				hum = tefDevicesStates.multisensors[0].data.humidity.humidity;
-				response.say("The humidity in your home is " + hum + " percentage. ");
+				response.say("The humidity in your home is " + hum + " percent. ");
 				mov = tefDevicesStates.multisensors[0].data.motion.motion;
 				t = tefDevicesStates.multisensors[0].data.motion.startTime;
 				console.log("startTime: " + t);
@@ -102,25 +103,33 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 				t = new Date(t);
 				console.log("parsed: " + t);
 				today = new Date();
-				today = today.getDay();
-				day = t.getDay();
+				today = today.getDate();
+				day = t.getDate();
+				console.log("day: " + day);
+				console.log("today: " + today);
 				day = today - day;
 				console.log("day: " + day);
+				/*
 				hour = t.getUTCHours() + ":" + t.getUTCMinutes();
 				hour = hour.substr(0, 0) + "0" + hour.substr(0);
 				hour = hour.substr(0, 3) + "0" + hour.substr(3);
 				console.log("hour: " + hour);
+				*/
+				minu = t.getUTCMinutes()+"";
+				if(t.getUTCMinutes() < 10){
+					minu = minu.substr(0, 0) + "0" + minu.substr(0);
+				}
 				if(mov == "DETECTED")
 					if(day == 0)
-						response.say("There has been motion detected today " + " at " + hour + ".");
+						response.say("There has been motion detected today " + " at " + t.getUTCHours() + " " + minu + ".");
 					else if(day == 1)
-						response.say("There has been motion detected yesterday " + " at " + hour + ".");
+						response.say("There has been motion detected yesterday " + " at "  + t.getUTCHours() + " " + t.getUTCMinutes() + ".");
 					else
-						response.say("There has been motion detected " + day + " days ago at " + hour + ".");
+						response.say("There has been motion detected " + day + " days ago at " + t.getUTCHours() + " " + t.getUTCMinutes() + ".");
 				else
 					response.say("There hasn't been motion detected.");
 				bat = tefDevicesStates.multisensors[0].data.batteryLevel.batteryLevel;
-				response.say("And the battery of the multisensor is " + bat + " percentage. ");
+				response.say("And the battery of the multisensor is " + bat + " percent. ");
 			}
 			else if(sensor == "door sensor"){
 				state="DoorSensorNow";
@@ -185,7 +194,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		prevState=state;
 		state="Temperature";
 		hum = tefDevicesStates.multisensors[0].data.humidity.humidity;
-		response.say("The humidity in your home is " + hum + " percentage. ");
+		response.say("The humidity in your home is " + hum + " percent. ");
 		response.say("Do you need anything else?");
 		response.shouldEndSession(false);
 	}
