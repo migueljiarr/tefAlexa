@@ -109,23 +109,17 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 				console.log("today: " + today);
 				day = today - day;
 				console.log("day: " + day);
-				/*
-				hour = t.getUTCHours() + ":" + t.getUTCMinutes();
-				hour = hour.substr(0, 0) + "0" + hour.substr(0);
-				hour = hour.substr(0, 3) + "0" + hour.substr(3);
-				console.log("hour: " + hour);
-				*/
 				minu = t.getUTCMinutes()+"";
 				if(t.getUTCMinutes() < 10){
 					minu = minu.substr(0, 0) + "0" + minu.substr(0);
 				}
 				if(mov == "DETECTED")
 					if(day == 0)
-						response.say("There has been motion detected today " + " at " + t.getUTCHours() + " " + minu + ".");
+						response.say("There has been motion detected today "+" at "+t.getUTCHours()+" "+minu+".");
 					else if(day == 1)
-						response.say("There has been motion detected yesterday " + " at "  + t.getUTCHours() + " " + t.getUTCMinutes() + ".");
+						response.say("There has been motion detected yesterday "+" at "+t.getUTCHours()+" "+minu+".");
 					else
-						response.say("There has been motion detected " + day + " days ago at " + t.getUTCHours() + " " + t.getUTCMinutes() + ".");
+						response.say("There has been motion detected "+day+" days ago at "+t.getUTCHours()+" "+minu+".");
 				else
 					response.say("There hasn't been motion detected.");
 				bat = tefDevicesStates.multisensors[0].data.batteryLevel.batteryLevel;
