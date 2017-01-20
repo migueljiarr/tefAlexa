@@ -50,25 +50,29 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
              "value":"VALUE"
          }
      	},
-	function(request,response) {
-		response.reprompt("Sorry, I didn't catch that. Could you repeat?");
-		console.log('Estoy en InformGeneralStateINTENT');
-		var time = request.slot("time");
-		prevState=state;
-		if(time == "today"){
-			state="InformGeneralStateToday";
-			response.say("Fake. Today your doors have been opened five times, there has been movement in your home ten times and there are two new recordings.");
+		function(request,response) {
+			response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+			console.log('Estoy en InformGeneralStateINTENT');
+			var time = request.slot("time");
+			prevState=state;
+			var ok = true;
+			if(time == "today"){
+				state="InformGeneralStateToday";
+				response.say("Fake. Today your doors have been opened five times, there has been movement in your home ten times and there are two new recordings.");
+			}
+			else if(time == "now"){
+				state="InformGeneralStateNow";
+				response.say("Right now two doors are open, there is not movement detected by the sensors and the cameras are not recording.");
+			}
+			else{
+				response.say("Sorry I didn't recognized the time, can you repeat?.");
+				ok = false;
+			}
+			if (ok){
+				response.say("Do you need anything else?");
+			}
+			response.shouldEndSession(false);
 		}
-		else if(time == "now"){
-			state="InformGeneralStateNow";
-			response.say("Right now two doors are open, there is not movement detected by the sensors and the cameras are not recording.");
-		}
-		else{
-			response.say("Sorry I didn't recognized the time, can you repeat?.");
-		}
-		response.say("Do you need anything else?");
-		response.shouldEndSession(true);
-	}
  );
 
  alexa.intent('DeviceIntent',
@@ -84,6 +88,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		var sensor = request.slot("sensor_name");
 		var time = request.slot("time");
 		prevState=state;
+		var ok = true;
 		if(time == "now"){
 			if(sensor == "multi sensor"){
 				state="MultiSensorNow";
@@ -156,6 +161,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			else{
 				state="RepeatNow";
 				response.say("Sorry I didn't recognized the device, can you repeat?.");
+				ok=false;
 			}
 		}
 		else if(time == "today"){
@@ -174,12 +180,16 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			else{
 				state="RepeatToday";
 				response.say("Fake. Sorry I didn't recognized the device, can you repeat?.");
+				ok=false;
 			}
 		}
 		else{
 			response.say("Sorry I didn't recognized the time, can you repeat?.");
+			ok=false;
 		}
-		response.say("Do you need anything else?");
+		if(ok){
+			response.say("Do you need anything else?");
+		}
 		response.shouldEndSession(false);
 	}
  );
