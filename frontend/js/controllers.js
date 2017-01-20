@@ -85,7 +85,7 @@ module.exports = function (app) {
 
                 // Socket
                 if ("Socket".toLocaleUpperCase() === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && $scope.socketStatus==null) {
-                    console.log("Socket: " + deviceDetails);
+                    console.log("New Socket: " + JSON.stringify(deviceDetails));
                     document.getElementById("userOut").innerHTML = "Estado: Smartplug detectado.";
                     $scope.socketStatus=deviceDetails.services[0].data.status;
                     console.log("socketStatus: " + $scope.socketStatus);
