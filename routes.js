@@ -156,7 +156,12 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			else if(sensor == "socket"){
 				state="SocketNow";
 				st = tefDevicesStates.sockets[0].data.status.status;
-				response.say("Your socket is " + st + ".");
+				networkSt = tefDevicesStates.sockets[0].status;
+				if(networkSt != "OFFLINE"){
+					response.say("Your socket is " + st + ".");
+				}
+				else
+					response.say("Your socket is offline at the moment.");
 			}
 			else{
 				state="RepeatNow";
