@@ -89,7 +89,10 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		var time = request.slot("time");
 		prevState=state;
 		var ok = true;
-		if(time == "now"){
+		/* Right now we don't support different times, because we are not sure 
+		 * wether it is an important use case or not.
+		 */
+		//if(time == "now"){
 			if(sensor == "multi sensor"){
 				state="MultiSensorNow";
 
@@ -168,9 +171,10 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 				response.say("Sorry I didn't recognized the device, can you repeat?.");
 				ok=false;
 			}
+		/*
 		}
 		else if(time == "today"){
-			if(sensor == "motion sensor"){
+			if(sensor == "multi sensor"){
 				state="MotionSensorToday";
 				response.say("Fake. Today your there has been movement in your home ten times.");
 			}
@@ -192,6 +196,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			response.say("Sorry I didn't recognized the time, can you repeat?.");
 			ok=false;
 		}
+		*/
 		if(ok){
 			response.say("Do you need anything else?");
 		}
