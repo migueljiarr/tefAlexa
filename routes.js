@@ -10,6 +10,8 @@ var fs = require('fs');
 
 var state = "";
 var prevState = "";
+var stSocket="off";
+var prevStSocket="off";
 
 var tefDevicesData  = {}; // Raw data from Huawei.
 var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}; // Useful data to give Alexa.
@@ -139,7 +141,6 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			}
 			else if(sensor == "door sensor"){
 				state="DoorSensorNow";
-				//response.say("Right now there two doors open.");
 
 				st = tefDevicesStates.contactsensors[0].data.status.status;
 				if(st == "CLOSED"){
@@ -232,6 +233,25 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		response.say("Do you need anything else?");
 		response.shouldEndSession(false);
 	}
+ );
+
+ alexa.intent('TurnXSocketIntent',
+        {
+         "slots":{
+             "name":"NAME",
+             "value":"VALUE"
+         }
+        },
+    function(request,response) {
+        response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+        console.log('Estoy en TurnXSocketIntent');
+        stSocket = request.slot("state");
+        prevState=state;
+		state="TurnXSocket";
+		response.say("Now your socket is " + stSocket + ".");
+		response.say("Do you need anything else?");
+		response.shouldEndSession(false);
+ 	}
  );
 
 
@@ -470,8 +490,15 @@ router.post('/UpdateTef', function(req, res, next){
 	tefDevicesData = req.body;
 	dataTreatment();
     res.status(200);
-	res.send("{}"); // Clients expects an answer with Content-type:text/json and 
-					// if empty it reports an "no element found" error.
+	var s;
+	if(prevStSocket == stSocket){
+		s = "unchanged";
+	}
+	else{
+		prevStSocket=stSocket;
+		s = stSocket;
+	}
+	res.json({"stSocket":s});
 });
 
 

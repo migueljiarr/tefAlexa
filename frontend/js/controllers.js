@@ -178,11 +178,29 @@ module.exports = function (app) {
 
         $scope.updateTef = function () {
 		$http.post('/UpdateTef',$scope.tefDevicesData)
-                .then(function (data) {
+                .then(function (response ) {
+					// Success.
                 	console.log('During /UpdateTef: ');
-	                console.log(JSON.stringify(data));
-       			console.log('End /UpdateTef treatment.');
-                });
+	                console.log("response: " + JSON.stringify(response));
+					console.log("data: " + JSON.stringify(response.data));
+					var d = response.data;
+					if(d.stSocket == "on"){
+						console.log('Turning on after /UpdateTef');
+						$scope.turnOn();
+					}
+					else if(d.stSocket == "off"){
+						console.log('Turning off after /UpdateTef');
+						$scope.turnOff();
+					}
+					else{
+						console.log("Not doin' anything /UpdateTef");
+					}
+	       			console.log('End /UpdateTef treatment.');
+                }, function(response){
+					// Error.
+                	console.log('Error during /UpdateTef: ');
+	                console.log("response: " + JSON.stringify(response));
+				});
 		};
         var interval = $interval($scope.updateTef,5000);
 
