@@ -200,7 +200,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			}
 			else if(sensor == "camera"){
 				state="CameraNow";
-				response.say("Right now the cameras are not recording.");
+				response.say("I'm sorry but right now the cameras are not supported.");
 			}
 			else if(sensor == "socket"){
 				state="SocketNow";
