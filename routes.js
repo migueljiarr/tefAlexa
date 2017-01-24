@@ -41,7 +41,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		numS = tefDevicesStates.sockets.length;
 		response.say("Currently Telefonica detects " + numMS + " multisensor, " + numCS + " contact sensor, " + numC + " camera and " + numS + " socket.");
 		response.say("Do you need anything else?");
-		response.shouldEndSession(true);
+		response.shouldEndSession(false);
 	}
  );
 
@@ -58,18 +58,63 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			var time = request.slot("time");
 			prevState=state;
 			var ok = true;
+			/* Right now we don't support different times, because we are not sure 
+			 * wether it is an important use case or not.
+		     */
+			//if(time == "now"){
+				state="InformGeneralStateNow";
+				//response.say("Right now two doors are open, there is not movement detected by the sensors and the cameras are not recording.");
+				temp = tefDevicesStates.multisensors[0].data.temperature.temperature;
+				response.say("The temperature in your home right now is " + temp + " degrees celsius.");
+				t = tefDevicesStates.multisensors[0].data.motion.startTime;
+				console.log("startTime: " + t);
+				t = t.substr(0, 4) + "-" + t.substr(4);
+				t = t.substr(0, 7) + "-" + t.substr(7);
+				t = t.substr(0, 13) + ":" + t.substr(13);
+				t = t.substr(0, 16) + ":" + t.substr(16);
+				console.log("startTime: " + t);
+				t = new Date(t);
+				console.log("parsed: " + t);
+				today = new Date();
+				today = today.getDate();
+				day = t.getDate();
+				console.log("day: " + day);
+				console.log("today: " + today);
+				day = today - day;
+				console.log("day: " + day);
+				minu = t.getMinutes()+"";
+				if(t.getMinutes() < 10){
+					minu = minu.substr(0, 0) + "0" + minu.substr(0);
+				}
+				if(day == 0)
+					response.say("Last time movement was detected was today at "+t.getHours()+" "+minu+". .");
+				else if(day == 1)
+					response.say("Last time movement was detected was yesterday at "+t.getHours()+" "+minu+". .");
+				else
+					response.say("Last time movement was detected was "+day+" days ago at "+t.getHours()+" "+minu+". .");
+				st = tefDevicesStates.contactsensors[0].data.status.status;
+				response.say("Your door is " + st + " at the moment.");
+				/* Camera: WIP
+				response.say(".");
+				*/
+				networkSt = tefDevicesStates.sockets[0].status;
+				if(networkSt != "OFFLINE"){
+					response.say("Your socket is " + tefDevicesStates.sockets[0].data.status.status + ".");
+				}
+				else
+					response.say("And your socket is offline.");
+			/*
+			}
 			if(time == "today"){
 				state="InformGeneralStateToday";
 				response.say("Fake. Today your doors have been opened five times, there has been movement in your home ten times and there are two new recordings.");
 			}
-			else if(time == "now"){
-				state="InformGeneralStateNow";
-				response.say("Right now two doors are open, there is not movement detected by the sensors and the cameras are not recording.");
-			}
+			else 
 			else{
 				response.say("Sorry I didn't recognized the time, can you repeat?.");
 				ok = false;
 			}
+			*/
 			if (ok){
 				response.say("Do you need anything else?");
 			}
@@ -122,24 +167,24 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 				console.log("today: " + today);
 				day = today - day;
 				console.log("day: " + day);
-				minu = t.getUTCMinutes()+"";
-				if(t.getUTCMinutes() < 10){
+				minu = t.getMinutes()+"";
+				if(t.getMinutes() < 10){
 					minu = minu.substr(0, 0) + "0" + minu.substr(0);
 				}
 				if(mov == "DETECTED")
 					if(day == 0)
-						response.say("There has been motion detected today "+" at "+t.getUTCHours()+" "+minu+".");
+						response.say("There has been motion detected today "+" at "+t.getHours()+" "+minu+".");
 					else if(day == 1)
-						response.say("There has been motion detected yesterday "+" at "+t.getUTCHours()+" "+minu+".");
+						response.say("There has been motion detected yesterday "+" at "+t.getHours()+" "+minu+".");
 					else
-						response.say("There has been motion detected "+day+" days ago at "+t.getUTCHours()+" "+minu+".");
+						response.say("There has been motion detected "+day+" days ago at "+t.getHours()+" "+minu+".");
 				else
 					response.say("There hasn't been motion detected.");
 
 				bat = tefDevicesStates.multisensors[0].data.batteryLevel.batteryLevel;
 				response.say("And the battery of the multisensor is " + bat + " percent. ");
 			}
-			else if(sensor == "door sensor"){
+			else if(sensor == "door sensor" || sensor == "contact sensor"){
 				state="DoorSensorNow";
 
 				st = tefDevicesStates.contactsensors[0].data.status.status;
