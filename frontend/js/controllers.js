@@ -174,7 +174,7 @@ module.exports = function (app) {
   				client.getDeviceDetails(key);
 			});
 		};
-        var interval = $interval($scope.updateDeviceDetails,5000);
+        var interval = $interval($scope.updateDeviceDetails,2000);
 
         $scope.updateTef = function () {
 		$http.post('/UpdateTef',$scope.tefDevicesData)
@@ -202,7 +202,7 @@ module.exports = function (app) {
 	                console.log("response: " + JSON.stringify(response));
 				});
 		};
-        var interval = $interval($scope.updateTef,5000);
+        var interval = $interval($scope.updateTef,2000);
 
         // var stopTime = $interval(setSmartplug, 1000);
         function setSmartplug() {
