@@ -8,8 +8,8 @@ var alexa_app = require('alexa-app');
 var alexa = new alexa_app.app('test');
 var fs = require('fs');
 
-var state = "";
-var prevState = "";
+var state = "tvOff";
+var prevState = "tvOff";
 var stSocket="off";
 var prevStSocket="off";
 
@@ -25,6 +25,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	response.shouldEndSession(false);
 	response.reprompt("Sorry, I didn't catch that. Could you repeat?");
  });
+
+// Beginning of intents for the real demo.
 
  alexa.intent('InformSetupIntent',
 	{
@@ -299,10 +301,68 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
  	}
  );
 
+ alexa.intent('EndIntent',
+     	{
+     	},
+     	function(request,response) {
+        	console.log('Estoy en devices status INTENT');
+        	response.say("I hope I have helped you. Bye!");
+		response.shouldEndSession(true);
+     	}
+ );
 
+ alexa.intent('YesIntent',
+     	{
+     	},
+     	function(request,response) {
+        	console.log('Estoy en devices status INTENT');
+        	response.say("Ok, what else can I do for you?");
+		response.shouldEndSession(false);
+     	}
+ );
 
+ alexa.intent('NoIntent',
+     	{
+     	},
+     	function(request,response) {
+        	console.log('Estoy en devices status INTENT');
+        	response.say("Ok. I hope I have have been of assistance. Good bye!");
+		response.shouldEndSession(true);
+     	}
+ );
 
+// End of intents for the real demo.
+// Beginning of faked intents.
 
+ alexa.intent('UpdateIntent',
+     	{
+     	},
+        function(request,response) {
+                console.log('Estoy en UPDATE INTENT');
+                if(prevState!="tvOff"){
+                        prevState=state;
+                        state="tvLastEvents";
+                }
+                else{
+                        prevState=state;
+                        state="updateUser";
+                }
+        	/*
+        	response.say("Your door has been opened twice from the time you went to work.");
+        	response.say(". . There has been an accident in the subway and all trains are delayed twenty minutes.");
+        	response.say(". . And your door sensor is running out of battery.");
+        	response.say(". . You can seen this and more in your TV.");
+        	response.say("Do you need anything else?");
+        	*/
+        	response.say("Yesterday while you weren't at home a new video was recorded.");
+        	//response.say(". . Today your door sensor is running out of battery and you should leave early because there has been an accident in the subway and all trains are delayed twenty minutes.");
+        	response.say(". . Today your door sensor is running out of battery and you should leave early because there is higher traffic than usual due to an incident in the train network.");
+        	response.say(". . You can seen this and more in your TV.");
+        	response.say("Do you need anything else?");
+        	response.reprompt("Sorry, I didn't catch that. Could you repeat?");
+        	response.shouldEndSession(false);
+        }
+ );
 
  alexa.intent('TurnOnTVIntent',
      	{
@@ -403,35 +463,9 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
- alexa.intent('EndIntent',
-     	{
-     	},
-     	function(request,response) {
-        	console.log('Estoy en devices status INTENT');
-        	response.say("I hope I have helped you. Bye!");
-		response.shouldEndSession(true);
-     	}
- );
-
- alexa.intent('YesIntent',
-     	{
-     	},
-     	function(request,response) {
-        	console.log('Estoy en devices status INTENT');
-        	response.say("Ok, what else can I do for you?");
-		response.shouldEndSession(false);
-     	}
- );
-
- alexa.intent('NoIntent',
-     	{
-     	},
-     	function(request,response) {
-        	console.log('Estoy en devices status INTENT');
-        	response.say("Ok. I hope I have have been of assistance. Good bye!");
-		response.shouldEndSession(true);
-     	}
- );
+ 
+// End of faked intents.
+// Begining of helper functions.
 
 function dataTreatment(){
 	console.log("New data. Weeeeee!");
@@ -530,6 +564,9 @@ function dataTreatment(){
 	console.log("tefDevicesStates: " + JSON.stringify(tefDevicesStates));
 }
 
+// End of helper functions.
+// Beginning of routing for real demo.
+
 router.post('/UpdateTef', function(req, res, next){
     console.log("Here is tefDevicesData: " + JSON.stringify(req.body));
 	tefDevicesData = req.body;
@@ -546,9 +583,6 @@ router.post('/UpdateTef', function(req, res, next){
 	res.json({"stSocket":s});
 });
 
-
-
-
 router.all('/', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -559,14 +593,6 @@ router.post('/', function(req, res, next) {
     res.render('index.html');
 });
 
-router.get('/alexa/test', function(req, res, next) {
-	/* Turns on TV and shows the main page 
-	 */
-    res.status(200);
-    res.sendFile(path.join(__dirname+'/frontend/views/tvTurningOn.html'));
-});
-
-
 router.post('/alexa/test',function(req,res) {
     console.log(JSON.stringify(req.body));
     alexa.request(req.body)        // connect express to alexa-app
@@ -574,5 +600,87 @@ router.post('/alexa/test',function(req,res) {
             res.json(response);      // stream it to express' output
         });
 });
+
+// End of routing for real demo.
+// Beginning of routing for faked demo.
+
+/*
+router.get('/alexa/test', function(req, res, next) {
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvTurningOn.html'));
+});
+*/
+
+router.get('/tvAlexa', function(req, res, next) {
+    console.log("Apagando la TV");
+    state = "tvOff";
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tv.html'));
+});
+
+router.get('/updateState', function(req, res, next) {
+        console.log("updateState"); 
+        console.log("prevState: " + prevState + " state: " + state);
+        if(state != prevState){
+                prevState=state;
+                console.log("updateState: turning On...");
+                res.status(200).send(state);
+                //res.sendFile(path.join(__dirname+'/frontend/views/' + state + '.html'));
+        }
+        else {
+                console.log("updateState: NOT turning ON...");
+                res.status(200).send("nothingChanged");
+        }
+});
+
+router.get('/tvOff', function(req, res, next) {
+    state = "tvOff";
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvOff.html'));
+});
+
+router.get('/tvTurningOn', function(req, res, next) {
+        /* Turns on TV and shows the main page
+         */
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvTurningOn.html'));
+});
+
+router.get('/tvMainPage', function(req, res, next) {
+        /* Shows the main page
+         */
+    state="tvMainPage";
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvMainPage.html'));
+});
+
+router.get('/updateUser', function(req, res, next) {
+        /* Shows the main page
+         */
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/updateUser.html'));
+});
+
+router.get('/tvPlayVideo', function(req, res, next) {
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvPlayVideo.html'));
+});
+
+router.get('/tvLastVideos', function(req, res, next) {
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvLastVideos.html'));
+});
+
+router.get('/tvLastEvents', function(req, res, next) {
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvLastEvents.html'));
+});
+
+router.get('/tvDevices', function(req, res, next) {
+    res.status(200);
+    res.sendFile(path.join(__dirname+'/frontend/views/tvDevices.html'));
+});
+
+// End of routing for faked demo.
 
 module.exports = router;
