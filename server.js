@@ -11,7 +11,8 @@ var router = require('./app');
 
 //var sslPath = '/etc/letsencrypt/live/becsmarthome.dnsdynamic.com/';
 //var sslPath = '/etc/letsencrypt/live/becsmarthome.tk/';
-var sslPath = '/home/migueljiarr/Projects/Work/tk/';
+//var sslPath = '/home/migueljiarr/Projects/Work/tk/';
+var sslPath = './tk/';
 
 var options = {  
     key: fs.readFileSync(sslPath + 'privkey.pem'),

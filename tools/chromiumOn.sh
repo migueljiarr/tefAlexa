@@ -1,0 +1,1 @@
+chromium-browser --disable-gpu --ignore-certificate-errors --allow-insecure-localhost safely-treat-insecure-origin-as-secure="https://62.14.234.69:8443" --user-data-dir=/tmp/foo --reduce-security-for-testing --allow-running-insecure-content --sync-allow-insecure-xmpp-connection https://becsmarthome.tk:8443/\#\!/main
