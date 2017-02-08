@@ -1,3 +1,4 @@
+// Dependencies.
 var express = require('express');
 var router = express.Router();
 var path = require('path');
@@ -8,6 +9,7 @@ var alexa_app = require('alexa-app');
 var alexa = new alexa_app.app('test');
 var fs = require('fs');
 
+// Global variables of the current state of the server.
 var state = "tvOff";
 var prevState = "tvOff";
 var stSocket="off";
@@ -18,6 +20,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 
  alexa.messages.NO_INTENT_FOUND = "Sorry, can you repeat?";
 
+// This executes everytime the skill is launched.
  alexa.launch(function(request,response) {
 	console.log("launching alexa\n");
 	response.say("Hello, welcome to Telefonica's assistance services.");
@@ -26,8 +29,10 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	response.reprompt("Sorry, I didn't catch that. Could you repeat?");
  });
 
-// Beginning of intents for the real demo.
+// Beginning of intents for the real demo (integration with Huawei).
 
+// How many devices are currently detected.
+// This intent is launched when asked "How many devices do you detect?"
  alexa.intent('InformSetupIntent',
 	{
 	},
@@ -47,6 +52,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	}
  );
 
+// Intent so Alexa tells you the most important data gathered by your devices.
+// This intent is launched when asked "How is my home?"
  alexa.intent('InformGeneralStateIntent',
      	{
          "slots":{
@@ -61,7 +68,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 			prevState=state;
 			var ok = true;
 			/* Right now we don't support different times, because we are not sure 
-			 * wether it is an important use case or not.
+			 * wether it is an important use case or not. 
+			 * We just give the data from "Right now".
 		     */
 			//if(time == "now"){
 				state="InformGeneralStateNow";
@@ -124,6 +132,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		}
  );
 
+// Intent so Alexa tells you the state of the device sent in the slot.
+// This intent is launched when asked "What's the state of my {sensor_name}"
  alexa.intent('DeviceIntent',
      	{
          "slots":{
@@ -140,6 +150,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 		var ok = true;
 		/* Right now we don't support different times, because we are not sure 
 		 * wether it is an important use case or not.
+		 * Alexa just answers with the current state of the device.
 		 */
 		//if(time == "now"){
 			if(sensor == "multi sensor"){
@@ -252,6 +263,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	}
  );
 
+// Temperature of your home.
+// This intent is launched when asked "What's the temperature in my home right now?"
  alexa.intent('TemperatureIntent',
 	{
 	},
@@ -267,6 +280,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	}
  );
 
+// Humidity of your home.
+// This intent is launched when asked "What's the humidity in my home right now?"
  alexa.intent('HumidityIntent',
 	{
 	},
@@ -282,6 +297,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
 	}
  );
 
+// Turn on/off the socket.
+// This intent is launched when asked "Turn my socket {state}"
  alexa.intent('TurnXSocketIntent',
         {
          "slots":{
@@ -301,6 +318,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
  	}
  );
 
+// Intent to finish the communication with Alexa.
  alexa.intent('EndIntent',
      	{
      	},
@@ -311,6 +329,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent to make communication with Alexa more natural.
  alexa.intent('YesIntent',
      	{
      	},
@@ -321,6 +340,7 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent to make communication with Alexa more natural and end it.
  alexa.intent('NoIntent',
      	{
      	},
@@ -332,8 +352,10 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
  );
 
 // End of intents for the real demo.
-// Beginning of faked intents.
+// Beginning of faked intents for the TV demo.
 
+// Intent showing the UX for future development of what could happen when asked
+// "What's happenned in my home since I left?"
  alexa.intent('UpdateIntent',
      	{
      	},
@@ -364,6 +386,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
         }
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to turn on the TV and show you the state of your home.
  alexa.intent('TurnOnTVIntent',
      	{
      	},
@@ -378,6 +402,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      }
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to turn off the TV and show you the state of your home.
  alexa.intent('TurnOffTVIntent',
      	{
      	},
@@ -391,6 +417,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to show you the state of your home.
  alexa.intent('StatusIntent',
      	{
      	},
@@ -405,6 +433,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to show you the last recorded videos.
  alexa.intent('LastVideosIntent',
      	{
      	},
@@ -419,6 +449,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to show you the last events.
  alexa.intent('LastEventsIntent',
      	{
 	},
@@ -436,6 +468,8 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to show you the devices in your home.
  alexa.intent('DevicesStatusIntent',
      	{
      	},
@@ -451,22 +485,25 @@ var tefDevicesStates = {multisensors:[],contactsensors:[],cameras:[],sockets:[]}
      	}
  );
 
+// Intent showing the UX for future development of what could happen when asked
+// to play the last video recorded.
  alexa.intent('PlayIntent',
      	{
      	},
      	function(request,response) {
-        	console.log('Estoy en devices status INTENT');
+        console.log('Estoy en devices status INTENT');
 		prevState=state;
 		state="tvPlayVideo";
-        	response.say("Playing yesterday's video.");
+        response.say("Playing yesterday's video.");
 		response.shouldEndSession(true);
      	}
  );
-
  
 // End of faked intents.
 // Begining of helper functions.
 
+// Here we filter the data sent from the client of Huawei's platform.
+// The client code is on frontend/js/controllers.js
 function dataTreatment(){
 	console.log("New data. Weeeeee!");
 	var name, status, data;
@@ -567,6 +604,7 @@ function dataTreatment(){
 // End of helper functions.
 // Beginning of routing for real demo.
 
+// Where the client posts the data from Huawei.
 router.post('/UpdateTef', function(req, res, next){
     console.log("Here is tefDevicesData: " + JSON.stringify(req.body));
 	tefDevicesData = req.body;
@@ -583,16 +621,19 @@ router.post('/UpdateTef', function(req, res, next){
 	res.json({"stSocket":s});
 });
 
+// Needed for Tizen's webapp to work as client for TV demo.
 router.all('/', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
  });
 
+// To load the client for real demo.
 router.post('/', function(req, res, next) {
     res.render('index.html');
 });
 
+// Alexa posts here when an intent is initiated.
 router.post('/alexa/test',function(req,res) {
     console.log(JSON.stringify(req.body));
     alexa.request(req.body)        // connect express to alexa-app
@@ -601,7 +642,7 @@ router.post('/alexa/test',function(req,res) {
         });
 });
 
-// End of routing for real demo.
+// End of routing for the real demo.
 // Beginning of routing for faked demo.
 
 /*
@@ -611,6 +652,7 @@ router.get('/alexa/test', function(req, res, next) {
 });
 */
 
+// Change state of the server to TV demo.
 router.get('/tvAlexa', function(req, res, next) {
     console.log("Apagando la TV");
     state = "tvOff";
@@ -618,6 +660,7 @@ router.get('/tvAlexa', function(req, res, next) {
     res.sendFile(path.join(__dirname+'/frontend/views/tv.html'));
 });
 
+// Change state of TV to update intent.
 router.get('/updateState', function(req, res, next) {
         console.log("updateState"); 
         console.log("prevState: " + prevState + " state: " + state);
@@ -633,49 +676,51 @@ router.get('/updateState', function(req, res, next) {
         }
 });
 
+// Change state of TV to off.
 router.get('/tvOff', function(req, res, next) {
     state = "tvOff";
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvOff.html'));
 });
 
+// Change state of TV to on.
 router.get('/tvTurningOn', function(req, res, next) {
-        /* Turns on TV and shows the main page
-         */
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvTurningOn.html'));
 });
 
+// Change state of TV to main menu.
 router.get('/tvMainPage', function(req, res, next) {
-        /* Shows the main page
-         */
     state="tvMainPage";
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvMainPage.html'));
 });
 
+// Change state of TV to main menu.
 router.get('/updateUser', function(req, res, next) {
-        /* Shows the main page
-         */
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/updateUser.html'));
 });
 
+// Change state of TV to play the video.
 router.get('/tvPlayVideo', function(req, res, next) {
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvPlayVideo.html'));
 });
 
+// Change state of TV to videos menu.
 router.get('/tvLastVideos', function(req, res, next) {
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvLastVideos.html'));
 });
 
+// Change state of TV to main menu.
 router.get('/tvLastEvents', function(req, res, next) {
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvLastEvents.html'));
 });
 
+// Change state of TV to devices menu.
 router.get('/tvDevices', function(req, res, next) {
     res.status(200);
     res.sendFile(path.join(__dirname+'/frontend/views/tvDevices.html'));

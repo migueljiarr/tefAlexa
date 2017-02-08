@@ -3,7 +3,11 @@ module.exports = function (app) {
     app.controller('mainPage', function ($scope,$http,$interval) {
         $scope.selectedIndex = 0;
         $scope.client=null;
+
+		// Data received from Huawei.
 		$scope.tefDevicesData = {};
+
+		// Login into the platform and prepare everything.
         $scope.init= function () {
             console.log("init");
             $scope.socket = null;
@@ -22,17 +26,20 @@ module.exports = function (app) {
                     IS_SERVER_PORT: ''
                 });
 
+			// Hardcoded credentials for now.
             var userCredentials = {
-                key: "0034123456789",
                 //key: "987654321",
+                key: "0034123456789",
                 secret: "Aa123456"
             };
 
             var deviceCollection = {};
 
-            // Manejador del evento de forma que reconozca el SmartPlug.
-            // Reconoce primero el gateway y de ahi recoge los dispositivos
-            // utilizados por este.
+			// Event handler for when a new devices is detected. This can be
+			// at login or when Huawei's platform answers a getDeviceDetails()
+			// request.
+			// We differentiate between each kind of device and parse it to
+			// the global JSON sent to the server (routes.js).
             client.on(client.event.deviceReadyEvent, function (response) {
                 var deviceDetails = JSON.parse(response);
 				
@@ -106,6 +113,7 @@ module.exports = function (app) {
                         }]
                     );
 
+					// We add the bottom to toggle the socket with them later on.
                     deviceCollection[deviceDetails.deviceId].addButton('SocketOFF', {  // commandObjectDefinition
                             description: 'This is the button to turn off the socket.',
                             deviceId: deviceDetails.deviceId,
@@ -127,6 +135,7 @@ module.exports = function (app) {
                     $scope.socket = deviceCollection[deviceDetails.deviceId];
 
                 }
+				// This is needed just for when we use the function toggle.
                 if ("Socket".toLocaleUpperCase() === deviceDetails.deviceInfo.deviceType.toLocaleUpperCase() && $scope.socketStatus!=null && toggling==1) {
                     console.log("Socket: " + deviceDetails);
                     $scope.socketStatus=deviceDetails.services[0].data.status;
@@ -148,18 +157,22 @@ module.exports = function (app) {
             console.log("end init");
         }
 
+		// We execute init.
         $scope.init();
 
+		// We use the previously created buttons to turn on the socket.
         $scope.turnOn= function () {
             document.getElementById("userOut").innerHTML = "Estado: smartplug encendido.";
             $scope.socket.buttons.SocketON.pressAndRelease();
         }
 
+		// We use the previously created buttons to turn off the socket.
         $scope.turnOff= function () {
             document.getElementById("userOut").innerHTML = "Estado: smartplug apagado.";
             $scope.socket.buttons.SocketOFF.pressAndRelease();
         };
 
+		// We update the status of the socket and wait for the event handler to toggle it.
         $scope.toggle= function () {
             console.log("Retrieving socket info from server");
             toggling=1;
@@ -167,6 +180,7 @@ module.exports = function (app) {
             console.log("Retrieved");
         };
 
+		// Update the data from Huawei's platform.
         $scope.updateDeviceDetails = function () {
 			console.log('Asking Huawei for an update: ');
 			Object.keys($scope.tefDevicesData).forEach(function(key){
@@ -176,6 +190,7 @@ module.exports = function (app) {
 		};
         var interval = $interval($scope.updateDeviceDetails,2000);
 
+		// Send the data to the server.
         $scope.updateTef = function () {
 		$http.post('/UpdateTef',$scope.tefDevicesData)
                 .then(function (response ) {
@@ -184,6 +199,10 @@ module.exports = function (app) {
 	                console.log("response: " + JSON.stringify(response));
 					console.log("data: " + JSON.stringify(response.data));
 					var d = response.data;
+
+					// This is a bad design but valid for a demo.
+					// Depending on the state given by the server we change
+					// the state of the socket.
 					if(d.stSocket == "on"){
 						console.log('Turning on after /UpdateTef');
 						$scope.turnOn();
@@ -204,6 +223,7 @@ module.exports = function (app) {
 		};
         var interval = $interval($scope.updateTef,2000);
 
+		// Only in use from the web page.
         // var stopTime = $interval(setSmartplug, 1000);
         function setSmartplug() {
             //console.log('Im ready to send the request');
@@ -234,37 +254,6 @@ module.exports = function (app) {
 
         //var interval = $interval(setSmartplug,5000);
 
-        $scope.contactWithGW = function () {
-            $scope.pepe = {};
-            console.log('hey!');
-            $http.get("/api/test")                            /*get: coger datos de un url*/
-                .success(function(data){
-                    $scope.pepe = data;
-                })
-                .error(function (error) {
-                    $scope.pepe = error;
-                })
-        };
-
-        $scope.updateLight = function (light) {
-            $http.post('/api/update/light', light)
-                .success(function (data) {
-                    console.log('all is right');
-                    console.log(data);
-                })
-                .error(function (error) {
-                    console.log(error);
-                })
-        };
-
-        $scope.next = function (){
-            console.log('pepe');
-            $scope.selectedIndex = Math.max($scope.selectedIndex +1, 2);
-        };
-        $scope.previous= function(){
-            console.log('popo');
-            $scope.selectedIndex = Math.min($scope.selectedIndex -1, 0);
-        }
     });
     app.controller('mainCtrl', function ($scope,$http) {
 
